@@ -5,14 +5,11 @@ on:
     branches:
       - main
 
-concurrency: ${{ github.workflow }}-${{ github.ref }}
-
 jobs:
   release:
     name: Release
     permissions:
       contents: write
-      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -36,17 +33,7 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Create Release PR or Publish
-        id: changesets
-        uses: changesets/action@v1
-        with:
-          commit: "chore: version packages"
-          title: "chore: version packages"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Generate GitHub Release
-        if: steps.changesets.outputs.hasChangesets == 'false'
         run: npx changelogithub
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
