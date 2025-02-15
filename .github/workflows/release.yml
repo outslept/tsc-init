@@ -10,6 +10,7 @@ jobs:
     name: Release
     permissions:
       contents: write
+      packages: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -21,6 +22,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
+          registry-url: 'https://npm.pkg.github.com'
 
       - name: Setup PNPM
         uses: pnpm/action-setup@v2
@@ -46,3 +48,13 @@ jobs:
         run: npx changelogithub
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Setup .npmrc file
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> .npmrc
+          echo "@${{ github.repository_owner }}:registry=https://npm.pkg.github.com" >> .npmrc
+
+      - name: Publish package to GitHub Packages
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
