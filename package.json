@@ -1,0 +1,33 @@
+{
+  "name": "@outslept/tsc-init",
+  "type": "module",
+  "version": "0.1.0",
+  "bin": {
+    "tsc-init": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.10.0",
+    "inquirer": "^12.4.1",
+    "picocolors": "^1.1.1"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^4.2.1",
+    "@types/inquirer": "^9.0.7",
+    "@types/node": "^22.13.4",
+    "eslint": "^9.20.1",
+    "eslint-plugin-format": "^1.0.1",
+    "tsup": "^8.3.6",
+    "typescript": "^5.7.3"
+  }
+}
