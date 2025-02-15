@@ -1,5 +1,11 @@
 # tsc-init
 
+## 1.0.1
+
+### Patch Changes
+
+- slightly improved workflow
+
 ## 1.0.0
 
 ### Major Changes

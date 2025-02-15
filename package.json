@@ -1,7 +1,7 @@
 {
   "name": "tsc-init",
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "packageManager": "pnpm@9.15.3",
   "repository": "https://github.com/outslept/tsc-init.git",
   "sideEffects": false,
