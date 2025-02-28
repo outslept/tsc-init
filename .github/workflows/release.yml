@@ -23,6 +23,7 @@ jobs:
         with:
           node-version: lts/*
           registry-url: 'https://npm.pkg.github.com'
+          scope: '@outslept'
 
       - name: Setup PNPM
         uses: pnpm/action-setup@v2
@@ -51,8 +52,8 @@ jobs:
 
       - name: Setup .npmrc file
         run: |
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> .npmrc
-          echo "@${{ github.repository_owner }}:registry=https://npm.pkg.github.com" >> .npmrc
+           echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> .npmrc
+           echo "@outslept:registry=https://npm.pkg.github.com" >> .npmrc
 
       - name: Publish package to GitHub Packages
         run: npm publish
