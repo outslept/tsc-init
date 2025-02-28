@@ -1,9 +1,19 @@
 {
-  "name": "tsc-init",
+  "name": "@outslept/tsc-init",
   "type": "module",
   "version": "1.0.1",
   "packageManager": "pnpm@9.15.3",
+  "description": "Interactive TypeSCript configuration generator",
+  "author": "outslept",
+  "license": "MIT",
   "repository": "https://github.com/outslept/tsc-init.git",
+  "keywords": [
+    "typescript",
+    "tsconfig",
+    "generator",
+    "cli",
+    "config"
+  ],
   "sideEffects": false,
   "bin": {
     "tsc-init": "./dist/index.js"
@@ -36,6 +46,7 @@
     "@types/node": "^22.13.4",
     "eslint": "^9.20.1",
     "eslint-plugin-format": "^1.0.1",
+    "pathe": "^2.0.3",
     "tsup": "^8.3.6",
     "typescript": "^5.7.3"
   }
