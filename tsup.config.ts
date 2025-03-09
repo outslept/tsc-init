@@ -8,5 +8,5 @@ export default defineConfig({
   clean: true,
   shims: true,
   dts: true,
-  noExternal: ["pathe", "picocolors", "@clack/prompts"],
+  noExternal: ['pathe', 'picocolors', '@clack/prompts'],
 })

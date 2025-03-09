@@ -7,11 +7,15 @@ import * as pathe from 'pathe'
 import pc from 'picocolors'
 
 const args = process.argv.slice(2)
-let isVerbose = false, outputPath = '', forceOverwrite = false
+let isVerbose = false
+let outputPath = ''
+let forceOverwrite = false
 
 for (let i = 0; i < args.length; i++) {
   const arg = args[i]
-  if (arg === '--verbose' || arg === '-v') isVerbose = true
+  if (arg === '--verbose' || arg === '-v') {
+    isVerbose = true
+  }
   else if (arg === '--help' || arg === '-h') {
     process.stdout.write(`
 ${pc.bold('@outslept/tsc-init')} - Interactive TypeScript configuration generator
@@ -33,8 +37,12 @@ ${pc.dim('Examples:')}
 `)
     process.exit(0)
   }
-  else if ((arg === '--output' || arg === '-o') && i + 1 < args.length) outputPath = args[++i]
-  else if (arg === '--force' || arg === '-f') forceOverwrite = true
+  else if ((arg === '--output' || arg === '-o') && i + 1 < args.length) {
+    outputPath = args[++i]
+  }
+  else if (arg === '--force' || arg === '-f') {
+    forceOverwrite = true
+  }
 }
 
 const DESCRIPTIONS = {
@@ -66,7 +74,7 @@ const DESCRIPTIONS = {
   },
 }
 
-const handleExit = (): never => {
+function handleExit(): never {
   process.stdout.write(pc.dim('\n\nOperation cancelled. Exiting...\n'))
   process.exit(0)
 }
@@ -74,53 +82,62 @@ const handleExit = (): never => {
 ['SIGINT', 'SIGTERM', 'SIGHUP'].forEach(signal => process.on(signal, handleExit))
 
 async function getOutputPath(initialPath: string): Promise<string> {
-  if (initialPath) return initialPath
+  if (initialPath)
+    return initialPath
 
   const customPath = await text({
     message: 'Where to save the config file?',
     placeholder: './tsconfig.json',
     initialValue: './tsconfig.json',
-    validate: value => {
-      if (!value) return 'Path is required'
-      if (value.trim() === '') return 'Path cannot be empty'
+    validate: (value) => {
+      if (!value)
+        return 'Path is required'
+      if (value.trim() === '')
+        return 'Path cannot be empty'
       return undefined
-    }
+    },
   })
 
-  if (isCancel(customPath)) handleExit()
+  if (isCancel(customPath))
+    handleExit()
   return customPath as string
 }
 
 async function ensureDirectoryExists(filePath: string): Promise<void> {
   const dirPath = pathe.dirname(filePath)
-  if (existsSync(dirPath)) return
+  if (existsSync(dirPath))
+    return
 
   const shouldCreate = await confirm({
-    message: `Directory ${pc.bold(pathe.relative(process.cwd(), dirPath))} doesn't exist. Create it?`
+    message: `Directory ${pc.bold(pathe.relative(process.cwd(), dirPath))} doesn't exist. Create it?`,
   })
 
-  if (isCancel(shouldCreate) || !shouldCreate) handleExit()
+  if (isCancel(shouldCreate) || !shouldCreate)
+    handleExit()
 
   try {
     const { mkdir } = await import('node:fs/promises')
     await mkdir(dirPath, { recursive: true })
-  } catch (error) {
+  }
+  catch (error) {
     process.stderr.write(pc.red(`\n✗ Failed to create directory: ${(error as Error).message}\n`))
     process.exit(1)
   }
 }
 
 async function checkFileOverwrite(filePath: string, force: boolean): Promise<void> {
-  if (!existsSync(filePath) || force) return
+  if (!existsSync(filePath) || force)
+    return
 
   const relativePath = pathe.relative(process.cwd(), filePath)
   const displayPath = relativePath.startsWith('..') ? filePath : `./${relativePath}`
 
   const shouldOverwrite = await confirm({
-    message: `${pc.yellow('!')} File ${pc.bold(displayPath)} already exists. Overwrite?`
+    message: `${pc.yellow('!')} File ${pc.bold(displayPath)} already exists. Overwrite?`,
   })
 
-  if (isCancel(shouldOverwrite) || !shouldOverwrite) handleExit()
+  if (isCancel(shouldOverwrite) || !shouldOverwrite)
+    handleExit()
 }
 
 function buildBaseCompilerOptions(): Record<string, unknown> {
@@ -135,26 +152,30 @@ function buildBaseCompilerOptions(): Record<string, unknown> {
     verbatimModuleSyntax: true,
     strict: true,
     noUncheckedIndexedAccess: true,
-    noImplicitOverride: true
+    noImplicitOverride: true,
   }
 }
 
 async function configureLibrary(options: Record<string, unknown>): Promise<void> {
   const isLibrary = await confirm({
-    message: isVerbose ? DESCRIPTIONS.library.verbose : DESCRIPTIONS.library.short
+    message: isVerbose ? DESCRIPTIONS.library.verbose : DESCRIPTIONS.library.short,
   })
 
-  if (isCancel(isLibrary)) handleExit()
-  if (!isLibrary) return
+  if (isCancel(isLibrary))
+    handleExit()
+  if (!isLibrary)
+    return
 
   options.declaration = true
 
   const isMonorepo = await confirm({
-    message: isVerbose ? DESCRIPTIONS.monorepo.verbose : DESCRIPTIONS.monorepo.short
+    message: isVerbose ? DESCRIPTIONS.monorepo.verbose : DESCRIPTIONS.monorepo.short,
   })
 
-  if (isCancel(isMonorepo)) handleExit()
-  if (!isMonorepo) return
+  if (isCancel(isMonorepo))
+    handleExit()
+  if (!isMonorepo)
+    return
 
   options.composite = true
   options.declarationMap = true
@@ -162,20 +183,22 @@ async function configureLibrary(options: Record<string, unknown>): Promise<void>
 
 async function configureTranspilation(options: Record<string, unknown>): Promise<void> {
   const isTranspiling = await confirm({
-    message: isVerbose ? DESCRIPTIONS.transpiling.verbose : DESCRIPTIONS.transpiling.short
+    message: isVerbose ? DESCRIPTIONS.transpiling.verbose : DESCRIPTIONS.transpiling.short,
   })
 
-  if (isCancel(isTranspiling)) handleExit()
+  if (isCancel(isTranspiling))
+    handleExit()
 
   if (isTranspiling) {
     Object.assign(options, {
       module: 'NodeNext',
       outDir: 'dist',
-      sourceMap: true
+      sourceMap: true,
     })
 
     await configureLibrary(options)
-  } else {
+  }
+  else {
     options.module = 'preserve'
     options.noEmit = true
   }
@@ -196,15 +219,16 @@ async function configureEnvironment(options: Record<string, unknown>): Promise<v
   const envOptions = Object.entries(DESCRIPTIONS.environment).map(([value, { short, verbose }]) => ({
     value,
     label: isVerbose ? verbose : short,
-    hint: isVerbose ? undefined : pc.dim(getEnvironmentHint(value))
+    hint: isVerbose ? undefined : pc.dim(getEnvironmentHint(value)),
   }))
 
   const environment = await select({
     message: `${pc.dim('Target environment:')}`,
-    options: envOptions
+    options: envOptions,
   })
 
-  if (isCancel(environment)) handleExit()
+  if (isCancel(environment))
+    handleExit()
 
   options.lib = environment === 'node'
     ? ['es2022']
@@ -241,7 +265,8 @@ async function writeConfigFile(filePath: string, compilerOptions: Record<string,
     s.stop('Configuration generated')
 
     printSuccess(filePath)
-  } catch (error) {
+  }
+  catch (error) {
     s.stop('Failed to generate configuration')
     process.stderr.write(pc.red(`\n✗ Failed to write configuration file: ${(error as Error).message}\n`))
     process.exit(1)
@@ -263,7 +288,7 @@ async function main(): Promise<void> {
   await writeConfigFile(absolutePath, compilerOptions)
 }
 
-main().catch(error => {
+main().catch((error) => {
   process.stderr.write(pc.red(`\n✗ ${error.message}\n`))
   process.exit(1)
 })
